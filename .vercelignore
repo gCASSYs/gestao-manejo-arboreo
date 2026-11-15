@@ -1,0 +1,10 @@
+.git
+.vercel
+outputs
+work
+tests
+instance
+__pycache__
+*.db
+*.sqlite3
+*.pyc
