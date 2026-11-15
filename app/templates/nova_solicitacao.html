@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Nova solicitação | Gestão de Manejo Arbóreo{% endblock %}
+{% block content %}
+  <h1 class="h2">Nova solicitação fictícia</h1>
+  <p class="text-secondary">Não informe nomes, documentos, telefones, endereços reais ou outros dados pessoais.</p>
+  <form method="post" class="card card-body shadow-sm" novalidate>
+    <div class="mb-3">
+      <label class="form-label" for="tipo">Tipo de manejo <span aria-hidden="true">*</span></label>
+      <select class="form-select" id="tipo" name="tipo" required>
+        <option value="">Selecione</option><option>Poda de formação</option><option>Vistoria preventiva</option><option>Remoção autorizada</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label class="form-label" for="local_referencia">Local de referência fictício <span aria-hidden="true">*</span></label>
+      <input class="form-control" id="local_referencia" name="local_referencia" placeholder="Ex.: Praça Exemplo, setor B" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label" for="prioridade">Prioridade</label>
+      <select class="form-select" id="prioridade" name="prioridade"><option>Normal</option><option>Alta</option></select>
+    </div>
+    <div class="d-flex gap-2"><button class="btn btn-success" type="submit">Registrar</button><a class="btn btn-outline-secondary" href="{{ url_for('main.index') }}">Cancelar</a></div>
+  </form>
+{% endblock %}
