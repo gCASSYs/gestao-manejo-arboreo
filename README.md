@@ -43,6 +43,10 @@ gestao-manejo-arboreo/
 
 O banco SQLite é criado automaticamente em `instance/manejo.db`. Os registros exibidos são exclusivamente fictícios.
 
+## Testes
+
+Instale as dependências de desenvolvimento com `pip install -r requirements-dev.txt` e execute `pytest -q`. A suíte cobre carregamento da aplicação, cadastro válido, validações, filtros e histórico de status.
+
 ## Segurança e privacidade
 
 - Não use dados pessoais, institucionais ou credenciais reais.
