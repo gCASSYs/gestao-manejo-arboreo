@@ -3,20 +3,22 @@
 {% block content %}
   <h1 class="h2">Nova solicitação fictícia</h1>
   <p class="text-secondary">Não informe nomes, documentos, telefones, endereços reais ou outros dados pessoais.</p>
-  <form method="post" class="card card-body shadow-sm" novalidate>
+  <form method="post" class="card card-body shadow-sm">
     <div class="mb-3">
       <label class="form-label" for="tipo">Tipo de manejo <span aria-hidden="true">*</span></label>
       <select class="form-select" id="tipo" name="tipo" required>
-        <option value="">Selecione</option><option>Poda de formação</option><option>Vistoria preventiva</option><option>Remoção autorizada</option>
+        <option value="">Selecione</option>
+        {% for tipo in tipos %}<option value="{{ tipo }}" {% if request.form.get('tipo') == tipo %}selected{% endif %}>{{ tipo }}</option>{% endfor %}
       </select>
     </div>
     <div class="mb-3">
       <label class="form-label" for="local_referencia">Local de referência fictício <span aria-hidden="true">*</span></label>
-      <input class="form-control" id="local_referencia" name="local_referencia" placeholder="Ex.: Praça Exemplo, setor B" required>
+      <input class="form-control" id="local_referencia" name="local_referencia" minlength="5" maxlength="120" value="{{ request.form.get('local_referencia', '') }}" placeholder="Ex.: Praça Exemplo, setor B" required>
+      <div class="form-text">Use apenas uma referência demonstrativa, sem endereço real.</div>
     </div>
     <div class="mb-3">
       <label class="form-label" for="prioridade">Prioridade</label>
-      <select class="form-select" id="prioridade" name="prioridade"><option>Normal</option><option>Alta</option></select>
+      <select class="form-select" id="prioridade" name="prioridade">{% for prioridade in prioridades %}<option value="{{ prioridade }}" {% if request.form.get('prioridade', 'Normal') == prioridade %}selected{% endif %}>{{ prioridade }}</option>{% endfor %}</select>
     </div>
     <div class="d-flex gap-2"><button class="btn btn-success" type="submit">Registrar</button><a class="btn btn-outline-secondary" href="{{ url_for('main.index') }}">Cancelar</a></div>
   </form>
