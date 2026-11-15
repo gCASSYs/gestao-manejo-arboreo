@@ -43,6 +43,10 @@ gestao-manejo-arboreo/
 
 O banco SQLite é criado automaticamente em `instance/manejo.db`. Os registros exibidos são exclusivamente fictícios.
 
+## Deploy na Vercel
+
+O arquivo `index.py` expõe a instância Flask para a Vercel e `vercel.json` exclui arquivos de desenvolvimento do pacote da função. A publicação pode ser feita importando este repositório em `vercel.com/new` ou pelo CLI da Vercel. Como o SQLite em funções serverless é efêmero, esta configuração é adequada para demonstração acadêmica; produção institucional exigiria um banco persistente.
+
 ## Testes
 
 Instale as dependências de desenvolvimento com `pip install -r requirements-dev.txt` e execute `pytest -q`. A suíte cobre carregamento da aplicação, cadastro válido, validações, filtros e histórico de status.
