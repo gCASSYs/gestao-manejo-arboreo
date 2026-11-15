@@ -12,6 +12,8 @@ permissions:
 jobs:
   tests:
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
     steps:
       - name: Baixar código
         uses: actions/checkout@v4
