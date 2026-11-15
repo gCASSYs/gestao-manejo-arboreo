@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Consulta | Gestão de Manejo Arbóreo{% endblock %}
+{% block content %}
+  <header class="mb-4">
+    <h1 class="h2">Consultar solicitações</h1>
+    <p class="text-secondary">Pesquise protocolos e referências exclusivamente fictícios.</p>
+  </header>
+  <form class="card card-body mb-4" method="get" role="search">
+    <div class="row g-3 align-items-end">
+      <div class="col-lg-5"><label class="form-label" for="busca">Protocolo ou referência</label><input class="form-control" id="busca" name="busca" value="{{ busca }}" placeholder="Ex.: DEMO ou Praça Exemplo"></div>
+      <div class="col-sm-6 col-lg-3"><label class="form-label" for="status">Status</label><select class="form-select" id="status" name="status"><option value="">Todos</option>{% for item in ('Recebida', 'Em análise', 'Concluída') %}<option value="{{ item }}" {% if status == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></div>
+      <div class="col-sm-6 col-lg-2"><label class="form-label" for="prioridade">Prioridade</label><select class="form-select" id="prioridade" name="prioridade"><option value="">Todas</option>{% for item in prioridades %}<option value="{{ item }}" {% if prioridade == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></div>
+      <div class="col-lg-2 d-grid"><button class="btn btn-success" type="submit">Filtrar</button></div>
+    </div>
+  </form>
+  <p aria-live="polite"><strong>{{ registros|length }}</strong> resultado(s) encontrado(s).</p>
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead><tr><th>Protocolo</th><th>Tipo</th><th>Referência fictícia</th><th>Prioridade</th><th>Status</th></tr></thead>
+      <tbody>{% for item in registros %}<tr><td>{{ item.protocolo }}</td><td>{{ item.tipo }}</td><td>{{ item.local_referencia }}</td><td>{{ item.prioridade }}</td><td><span class="badge text-bg-secondary">{{ item.status }}</span></td></tr>{% else %}<tr><td colspan="5" class="text-center text-secondary py-4">Nenhum registro corresponde aos filtros.</td></tr>{% endfor %}</tbody>
+    </table>
+  </div>
+{% endblock %}

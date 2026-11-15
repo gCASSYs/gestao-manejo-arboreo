@@ -31,6 +31,37 @@ def index():
     return render_template("index.html", registros=registros)
 
 
+@bp.get("/solicitacoes")
+def listar_solicitacoes():
+    busca = request.args.get("busca", "").strip()
+    status = request.args.get("status", "").strip()
+    prioridade = request.args.get("prioridade", "").strip()
+
+    consulta = "SELECT * FROM solicitacao WHERE 1 = 1"
+    parametros = []
+    if busca:
+        consulta += " AND (protocolo LIKE ? OR local_referencia LIKE ?)"
+        termo = f"%{busca}%"
+        parametros.extend((termo, termo))
+    if status:
+        consulta += " AND status = ?"
+        parametros.append(status)
+    if prioridade in PRIORIDADES_VALIDAS:
+        consulta += " AND prioridade = ?"
+        parametros.append(prioridade)
+    consulta += " ORDER BY criado_em DESC"
+
+    registros = get_db().execute(consulta, parametros).fetchall()
+    return render_template(
+        "solicitacoes.html",
+        registros=registros,
+        busca=busca,
+        status=status,
+        prioridade=prioridade,
+        prioridades=PRIORIDADES_VALIDAS,
+    )
+
+
 @bp.route("/solicitacoes/nova", methods=("GET", "POST"))
 def nova_solicitacao():
     if request.method == "POST":

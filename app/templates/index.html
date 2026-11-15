@@ -7,7 +7,7 @@
   <section aria-labelledby="recentes">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h2 class="h4 mb-0" id="recentes">Solicitações recentes</h2>
-      <a class="btn btn-success" href="{{ url_for('main.nova_solicitacao') }}">Cadastrar solicitação</a>
+      <div class="d-flex gap-2"><a class="btn btn-outline-success" href="{{ url_for('main.listar_solicitacoes') }}">Ver todas</a><a class="btn btn-success" href="{{ url_for('main.nova_solicitacao') }}">Cadastrar solicitação</a></div>
     </div>
     {% if registros %}
       <div class="table-responsive">
