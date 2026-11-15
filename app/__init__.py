@@ -21,4 +21,16 @@ def create_app(test_config=None):
     from .routes import bp
 
     app.register_blueprint(bp)
+
+    @app.after_request
+    def adicionar_cabecalhos_seguranca(response):
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; style-src 'self' https://cdn.jsdelivr.net; "
+            "script-src 'none'; img-src 'self' data:"
+        )
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "same-origin"
+        return response
+
     return app
