@@ -47,6 +47,8 @@ O banco SQLite é criado automaticamente em `instance/manejo.db`. Os registros e
 
 Instale as dependências de desenvolvimento com `pip install -r requirements-dev.txt` e execute `pytest -q`. A suíte cobre carregamento da aplicação, cadastro válido, validações, filtros e histórico de status.
 
+O GitHub Actions executa automaticamente a mesma suíte em cada push e Pull Request para `main`, exigindo cobertura mínima de 80% no pacote `app`.
+
 ## Segurança e privacidade
 
 - Não use dados pessoais, institucionais ou credenciais reais.
