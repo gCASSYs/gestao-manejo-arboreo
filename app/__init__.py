@@ -6,7 +6,13 @@ from .db import init_app
 
 
 def create_app(test_config=None):
-    app = Flask(__name__, instance_relative_config=True)
+    instance_path = None
+    if os.getenv("VERCEL"):
+        instance_path = "/tmp/manejo-instance"
+    app_options = {"instance_relative_config": True}
+    if instance_path:
+        app_options["instance_path"] = instance_path
+    app = Flask(__name__, **app_options)
     app.config.from_mapping(
         SECRET_KEY=os.getenv("SECRET_KEY", "dev-only-change-me"),
         DATABASE=os.path.join(app.instance_path, "manejo.db"),
