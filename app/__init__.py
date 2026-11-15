@@ -6,7 +6,13 @@ from .db import init_app
 
 
 def create_app(test_config=None):
-    app = Flask(__name__, instance_relative_config=True)
+    instance_path = None
+    if os.getenv("VERCEL"):
+        instance_path = "/tmp/manejo-instance"
+    app_options = {"instance_relative_config": True}
+    if instance_path:
+        app_options["instance_path"] = instance_path
+    app = Flask(__name__, **app_options)
     app.config.from_mapping(
         SECRET_KEY=os.getenv("SECRET_KEY", "dev-only-change-me"),
         DATABASE=os.path.join(app.instance_path, "manejo.db"),
@@ -21,4 +27,16 @@ def create_app(test_config=None):
     from .routes import bp
 
     app.register_blueprint(bp)
+
+    @app.after_request
+    def adicionar_cabecalhos_seguranca(response):
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; style-src 'self' https://cdn.jsdelivr.net; "
+            "script-src 'none'; img-src 'self' data:"
+        )
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "same-origin"
+        return response
+
     return app

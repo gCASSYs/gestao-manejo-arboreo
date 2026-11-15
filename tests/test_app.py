@@ -5,6 +5,8 @@ def test_index_loads(client):
     response = client.get("/")
     assert response.status_code == 200
     assert "Gestão de Manejo Arbóreo" in response.get_data(as_text=True)
+    assert response.headers["X-Content-Type-Options"] == "nosniff"
+    assert response.headers["X-Frame-Options"] == "DENY"
 
 
 def test_cadastro_valido_persiste_solicitacao(app, client):
@@ -40,6 +42,20 @@ def test_cadastro_invalido_exibe_erros_e_nao_persiste(app, client):
     with app.app_context():
         total = get_db().execute("SELECT COUNT(*) FROM solicitacao").fetchone()[0]
         assert total == 0
+
+
+def test_cadastro_normaliza_espacos(app, client):
+    client.post(
+        "/solicitacoes/nova",
+        data={
+            "tipo": "Vistoria preventiva",
+            "local_referencia": "  Praça   Exemplo,   setor C  ",
+            "prioridade": "Alta",
+        },
+    )
+    with app.app_context():
+        local = get_db().execute("SELECT local_referencia FROM solicitacao").fetchone()[0]
+        assert local == "Praça Exemplo, setor C"
 
 
 def test_consulta_filtra_por_protocolo_e_prioridade(client, solicitacao_id):

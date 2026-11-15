@@ -3,26 +3,16 @@ from datetime import datetime
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 
 from .db import get_db
+from .domain import (
+    PRIORIDADES_VALIDAS,
+    STATUS_VALIDOS,
+    TIPOS_VALIDOS,
+    normalizar_texto,
+    validar_atualizacao_status,
+    validar_solicitacao,
+)
 
 bp = Blueprint("main", __name__)
-
-TIPOS_VALIDOS = ("Poda de formação", "Vistoria preventiva", "Remoção autorizada")
-PRIORIDADES_VALIDAS = ("Normal", "Alta")
-STATUS_VALIDOS = ("Recebida", "Em análise", "Concluída")
-
-
-def validar_solicitacao(tipo, local, prioridade):
-    erros = []
-    if tipo not in TIPOS_VALIDOS:
-        erros.append("Selecione um tipo de manejo válido.")
-    if not local:
-        erros.append("Informe um local de referência fictício.")
-    elif len(local) < 5 or len(local) > 120:
-        erros.append("O local de referência deve ter entre 5 e 120 caracteres.")
-    if prioridade not in PRIORIDADES_VALIDAS:
-        erros.append("Selecione uma prioridade válida.")
-    return erros
-
 
 @bp.get("/")
 def index():
@@ -67,7 +57,7 @@ def listar_solicitacoes():
 def nova_solicitacao():
     if request.method == "POST":
         tipo = request.form.get("tipo", "").strip()
-        local = request.form.get("local_referencia", "").strip()
+        local = normalizar_texto(request.form.get("local_referencia", ""))
         prioridade = request.form.get("prioridade", "Normal").strip()
 
         erros = validar_solicitacao(tipo, local, prioridade)
@@ -108,13 +98,11 @@ def detalhe_solicitacao(solicitacao_id):
 
     if request.method == "POST":
         novo_status = request.form.get("status", "").strip()
-        observacao = request.form.get("observacao", "").strip()
-        if novo_status not in STATUS_VALIDOS:
-            flash("Selecione um status válido.", "danger")
-        elif len(observacao) > 250:
-            flash("A observação deve ter no máximo 250 caracteres.", "danger")
-        elif novo_status == solicitacao["status"]:
-            flash("O status informado já está ativo.", "warning")
+        observacao = normalizar_texto(request.form.get("observacao", ""))
+        erro = validar_atualizacao_status(solicitacao["status"], novo_status, observacao)
+        if erro:
+            categoria = "warning" if novo_status == solicitacao["status"] else "danger"
+            flash(erro, categoria)
         else:
             db.execute(
                 "UPDATE solicitacao SET status = ? WHERE id = ?",
