@@ -8,6 +8,7 @@ bp = Blueprint("main", __name__)
 
 TIPOS_VALIDOS = ("Poda de formação", "Vistoria preventiva", "Remoção autorizada")
 PRIORIDADES_VALIDAS = ("Normal", "Alta")
+STATUS_VALIDOS = ("Recebida", "Em análise", "Concluída")
 
 
 def validar_solicitacao(tipo, local, prioridade):
@@ -80,6 +81,11 @@ def nova_solicitacao():
                 "INSERT INTO solicitacao (protocolo, tipo, local_referencia, prioridade) VALUES (?, ?, ?, ?)",
                 (protocolo, tipo, local, prioridade),
             )
+            solicitacao_id = db.execute("SELECT last_insert_rowid()").fetchone()[0]
+            db.execute(
+                "INSERT INTO historico_status (solicitacao_id, status_novo, observacao) VALUES (?, ?, ?)",
+                (solicitacao_id, "Recebida", "Solicitação fictícia cadastrada."),
+            )
             db.commit()
             flash(f"Solicitação fictícia {protocolo} registrada.", "success")
             return redirect(url_for("main.index"))
@@ -88,4 +94,47 @@ def nova_solicitacao():
         "nova_solicitacao.html",
         tipos=TIPOS_VALIDOS,
         prioridades=PRIORIDADES_VALIDAS,
+    )
+
+
+@bp.route("/solicitacoes/<int:solicitacao_id>", methods=("GET", "POST"))
+def detalhe_solicitacao(solicitacao_id):
+    db = get_db()
+    solicitacao = db.execute(
+        "SELECT * FROM solicitacao WHERE id = ?", (solicitacao_id,)
+    ).fetchone()
+    if solicitacao is None:
+        return render_template("404.html"), 404
+
+    if request.method == "POST":
+        novo_status = request.form.get("status", "").strip()
+        observacao = request.form.get("observacao", "").strip()
+        if novo_status not in STATUS_VALIDOS:
+            flash("Selecione um status válido.", "danger")
+        elif len(observacao) > 250:
+            flash("A observação deve ter no máximo 250 caracteres.", "danger")
+        elif novo_status == solicitacao["status"]:
+            flash("O status informado já está ativo.", "warning")
+        else:
+            db.execute(
+                "UPDATE solicitacao SET status = ? WHERE id = ?",
+                (novo_status, solicitacao_id),
+            )
+            db.execute(
+                "INSERT INTO historico_status (solicitacao_id, status_anterior, status_novo, observacao) VALUES (?, ?, ?, ?)",
+                (solicitacao_id, solicitacao["status"], novo_status, observacao),
+            )
+            db.commit()
+            flash("Status atualizado e registrado no histórico.", "success")
+            return redirect(url_for("main.detalhe_solicitacao", solicitacao_id=solicitacao_id))
+
+    historico = db.execute(
+        "SELECT * FROM historico_status WHERE solicitacao_id = ? ORDER BY criado_em DESC, id DESC",
+        (solicitacao_id,),
+    ).fetchall()
+    return render_template(
+        "detalhe_solicitacao.html",
+        solicitacao=solicitacao,
+        historico=historico,
+        status_validos=STATUS_VALIDOS,
     )

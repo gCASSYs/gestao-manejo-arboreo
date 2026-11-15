@@ -15,7 +15,7 @@
           <thead><tr><th>Protocolo</th><th>Tipo</th><th>Referência fictícia</th><th>Prioridade</th><th>Status</th></tr></thead>
           <tbody>
             {% for item in registros %}
-              <tr><td>{{ item.protocolo }}</td><td>{{ item.tipo }}</td><td>{{ item.local_referencia }}</td><td>{{ item.prioridade }}</td><td><span class="badge text-bg-secondary">{{ item.status }}</span></td></tr>
+              <tr><td><a href="{{ url_for('main.detalhe_solicitacao', solicitacao_id=item.id) }}">{{ item.protocolo }}</a></td><td>{{ item.tipo }}</td><td>{{ item.local_referencia }}</td><td>{{ item.prioridade }}</td><td><span class="badge text-bg-secondary">{{ item.status }}</span></td></tr>
             {% endfor %}
           </tbody>
         </table>

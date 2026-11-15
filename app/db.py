@@ -14,6 +14,15 @@ CREATE TABLE IF NOT EXISTS solicitacao (
     status TEXT NOT NULL DEFAULT 'Recebida',
     criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE IF NOT EXISTS historico_status (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    solicitacao_id INTEGER NOT NULL,
+    status_anterior TEXT,
+    status_novo TEXT NOT NULL,
+    observacao TEXT NOT NULL DEFAULT '',
+    criado_em TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (solicitacao_id) REFERENCES solicitacao (id)
+);
 """
 
 
@@ -21,6 +30,7 @@ def get_db():
     if "db" not in g:
         g.db = sqlite3.connect(current_app.config["DATABASE"])
         g.db.row_factory = sqlite3.Row
+        g.db.execute("PRAGMA foreign_keys = ON")
     return g.db
 
 
